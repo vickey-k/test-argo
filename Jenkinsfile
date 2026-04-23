@@ -1,3 +1,6 @@
+cd ~/test-argo
+
+cat <<EOF > Jenkinsfile
 pipeline {
     agent any
 
@@ -19,11 +22,13 @@ pipeline {
         stage('Validate Manifests') {
             steps {
                 echo "---- Validating YAML files ----"
-                bat """
-                    kubectl apply --dry-run=client -f k8s-manifests/apps/my-app/deployment.yaml
-                    kubectl apply --dry-run=client -f k8s-manifests/apps/my-app/service.yaml
+                sh """
+                    kubectl apply --dry-run=client \
+                        -f k8s-manifests/apps/my-app/deployment.yaml
+                    kubectl apply --dry-run=client \
+                        -f k8s-manifests/apps/my-app/service.yaml
+                    echo "Manifests are valid!"
                 """
-                echo "Manifests are valid!"
             }
         }
 
@@ -34,17 +39,17 @@ pipeline {
                     credentialsId: 'ARGOCD_TOKEN',
                     variable: 'ARGOCD_AUTH_TOKEN'
                 )]) {
-                    bat """
-                        argocd app sync %APP_NAME% ^
-                            --server %ARGOCD_SERVER% ^
-                            --auth-token %ARGOCD_AUTH_TOKEN% ^
+                    sh """
+                        argocd app sync ${APP_NAME} \
+                            --server ${ARGOCD_SERVER} \
+                            --auth-token \$ARGOCD_AUTH_TOKEN \
                             --insecure
 
-                        argocd app wait %APP_NAME% ^
-                            --server %ARGOCD_SERVER% ^
-                            --auth-token %ARGOCD_AUTH_TOKEN% ^
-                            --insecure ^
-                            --health ^
+                        argocd app wait ${APP_NAME} \
+                            --server ${ARGOCD_SERVER} \
+                            --auth-token \$ARGOCD_AUTH_TOKEN \
+                            --insecure \
+                            --health \
                             --timeout 120
                     """
                 }
@@ -54,11 +59,11 @@ pipeline {
         stage('Verify Deployment') {
             steps {
                 echo "---- Checking Pods ----"
-                bat """
+                sh """
                     kubectl get pods -n default -l app=my-app
                     kubectl rollout status deployment/my-app -n default
+                    echo "Deployment verified!"
                 """
-                echo "Deployment verified!"
             }
         }
     }
@@ -72,3 +77,9 @@ pipeline {
         }
     }
 }
+EOF
+
+# Push to GitHub
+git add Jenkinsfile
+git commit -m "fix: change bat to sh for Linux Jenkins"
+git push origin main
