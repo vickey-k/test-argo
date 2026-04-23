@@ -6,7 +6,7 @@ metadata:
 spec:
   project: default
   source:
-    repoURL: https://github.com/your-org/k8s-manifests.git   # ← your repo URL
+    repoURL: https://github.com/vickey-k/test-argo.git   # ← your repo URL
     targetRevision: main
     path: apps/my-app                                          # ← points to this folder
   destination:
