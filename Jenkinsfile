@@ -1,6 +1,3 @@
-cd ~/test-argo
-
-cat <<EOF > Jenkinsfile
 pipeline {
     agent any
 
