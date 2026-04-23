@@ -12,7 +12,7 @@ pipeline {
             steps {
                 echo "---- Cloning Public Repo ----"
                 git branch: 'main',
-                    url: 'https://github.com/your-username/k8s-manifests.git'
+                    url: 'https://github.com/vickey-k/test-argo.git'
             }
         }
 
