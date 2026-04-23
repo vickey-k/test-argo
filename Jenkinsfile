@@ -74,9 +74,3 @@ pipeline {
         }
     }
 }
-EOF
-
-# Push to GitHub
-git add Jenkinsfile
-git commit -m "fix: change bat to sh for Linux Jenkins"
-git push origin main
