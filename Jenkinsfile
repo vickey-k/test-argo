@@ -19,11 +19,11 @@ pipeline {
         stage('Validate Manifests') {
             steps {
                 echo "---- Validating YAML files ----"
-                sh """
-                    kubectl apply --dry-run=client -f apps/my-app/deployment.yaml
-                    kubectl apply --dry-run=client -f apps/my-app/service.yaml
-                    echo "✅ Manifests are valid!"
+                bat """
+                    kubectl apply --dry-run=client -f k8s-manifests/apps/my-app/deployment.yaml
+                    kubectl apply --dry-run=client -f k8s-manifests/apps/my-app/service.yaml
                 """
+                echo "Manifests are valid!"
             }
         }
 
@@ -34,17 +34,17 @@ pipeline {
                     credentialsId: 'ARGOCD_TOKEN',
                     variable: 'ARGOCD_AUTH_TOKEN'
                 )]) {
-                    sh """
-                        argocd app sync ${APP_NAME} \
-                            --server ${ARGOCD_SERVER} \
-                            --auth-token \$ARGOCD_AUTH_TOKEN \
+                    bat """
+                        argocd app sync %APP_NAME% ^
+                            --server %ARGOCD_SERVER% ^
+                            --auth-token %ARGOCD_AUTH_TOKEN% ^
                             --insecure
 
-                        argocd app wait ${APP_NAME} \
-                            --server ${ARGOCD_SERVER} \
-                            --auth-token \$ARGOCD_AUTH_TOKEN \
-                            --insecure \
-                            --health \
+                        argocd app wait %APP_NAME% ^
+                            --server %ARGOCD_SERVER% ^
+                            --auth-token %ARGOCD_AUTH_TOKEN% ^
+                            --insecure ^
+                            --health ^
                             --timeout 120
                     """
                 }
@@ -54,21 +54,21 @@ pipeline {
         stage('Verify Deployment') {
             steps {
                 echo "---- Checking Pods ----"
-                sh """
+                bat """
                     kubectl get pods -n default -l app=my-app
                     kubectl rollout status deployment/my-app -n default
-                    echo "✅ Deployment verified!"
                 """
+                echo "Deployment verified!"
             }
         }
     }
 
     post {
         success {
-            echo "✅ SUCCESS — my-app is live on cluster!"
+            echo "SUCCESS — my-app is live!"
         }
         failure {
-            echo "❌ FAILED — Check ArgoCD UI or kubectl logs"
+            echo "FAILED — Check ArgoCD UI or kubectl logs"
         }
     }
 }
