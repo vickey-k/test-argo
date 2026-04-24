@@ -34,17 +34,20 @@ pipeline {
                 echo "---- Triggering ArgoCD Sync ----"
                 withCredentials([string(
                     credentialsId: 'ARGOCD_TOKEN',
-                    variable: 'ARGOCD_AUTH_TOKEN'
+                    variable: 'ARGOCD_PASS'
                 )]) {
                     sh """
+                        argocd login ${ARGOCD_SERVER} \
+                            --username admin \
+                            --password \$ARGOCD_PASS \
+                            --insecure
+
                         argocd app sync ${APP_NAME} \
                             --server ${ARGOCD_SERVER} \
-                            --auth-token \$ARGOCD_AUTH_TOKEN \
                             --insecure
 
                         argocd app wait ${APP_NAME} \
                             --server ${ARGOCD_SERVER} \
-                            --auth-token \$ARGOCD_AUTH_TOKEN \
                             --insecure \
                             --health \
                             --timeout 120
