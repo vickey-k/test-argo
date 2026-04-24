@@ -3,7 +3,7 @@ pipeline {
 
     environment {
         ARGOCD_SERVER = "192.168.64.8:31339"
-        APP_NAME      = "my-app"
+        APP_NAME      = "nagendar"
     }
 
     stages {
