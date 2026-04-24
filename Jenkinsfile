@@ -2,7 +2,7 @@ pipeline {
     agent any
 
     environment {
-        ARGOCD_SERVER = "192.168.64.6:31705"
+        ARGOCD_SERVER = "192.168.64.8:31339"
         APP_NAME      = "my-app"
     }
 
